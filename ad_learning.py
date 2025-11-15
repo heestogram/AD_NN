@@ -1,6 +1,5 @@
 from data_gen import *
 
-
 def ad_linear(X, A, R, K, alpha=1.0):
     n, p = X.shape
     V = simplex_vertices(K).numpy()           
