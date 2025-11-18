@@ -327,7 +327,7 @@ def ad_nn_with_warmup_poly(
                     W_quad = W[:, p:]      
                     # 변수 j의 중요도 = linear+quadratic weight를 함께 본 L2 norm
                     scores = torch.sqrt((W_lin ** 2).sum(dim=0) +
-                                        (W_quad ** 2).sum(dim=0))  # (p,)
+                                        (W_quad ** 2).sum(dim=0))  
 
                 else:
                     raise ValueError(f"Unexpected first-layer dim: d_in={d_in}, p={p}")
