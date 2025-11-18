@@ -8,7 +8,7 @@ class FeatureGate(nn.Module):
         self.k_active = k_active  
     def forward(self, x):
         if self.k_active is None:
-            # warmup 단계: 게이트 효과 없이 통과
+            # warmup step without featureGate
             return x
 
         prob = torch.sigmoid(self.logit)  
@@ -37,8 +37,7 @@ class PolyFeatureGate(nn.Module):
         feats = [x]
         if self.degree >= 2:
             feats.append(x ** 2)
-        # 교차항까지 쓰고 싶으면 여기에서 추가
-        # ex) feats.append(x[:, [0]] * x[:, [1]])
+
         return torch.cat(feats, dim=1)  
 
 
