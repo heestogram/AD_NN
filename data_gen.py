@@ -308,3 +308,61 @@ def simulate_data_surv(
     Delta = (R_true <= C).astype(int)
 
     return X, A, T, Delta, true_opt, R_true, C
+
+
+import numpy as np
+
+def screen_by_corr(X, A, R, K, top_m=10):
+
+    X = np.asarray(X)
+    A = np.asarray(A)
+    R = np.asarray(R)
+
+    n, p = X.shape
+    scores = np.zeros(p, dtype=float)
+
+    for j in range(p):
+        corr_sq_sum = 0.0
+
+        for k in range(K):
+            mask = (A == k)
+            xj = X[mask, j]
+            rk = R[mask]
+
+            # 표준편차 0이면 corr 정의 안 되므로 스킵
+            if xj.size < 2 or np.std(xj) == 0 or np.std(rk) == 0:
+                continue
+
+            c = np.corrcoef(xj, rk)[0, 1]
+            corr_sq_sum += c**2
+
+        scores[j] = np.sqrt(corr_sq_sum)
+
+    # 중요도가 큰 순서대로 top_m개 선택
+    idx_sorted = np.argsort(-scores)
+    selected_idx = idx_sorted[:top_m]
+
+    return selected_idx, scores
+
+
+def screen_by_corr_global(X, A, R, K, top_m=10):
+    """
+    Treatment 무시하고, 각 변수 X_j와 R의 상관계수 |corr(X_j, R)| 로 feature screening.
+    """
+    X = np.asarray(X)
+    R = np.asarray(R)
+    n, p = X.shape
+
+    scores = np.zeros(p, dtype=float)
+
+    for j in range(p):
+        xj = X[:, j]
+        if xj.std() == 0 or R.std() == 0:
+            scores[j] = 0.0
+        else:
+            c = np.corrcoef(xj, R)[0, 1]
+            scores[j] = abs(c)
+
+    idx_sorted = np.argsort(-scores)   # 큰 순서대로
+    selected_idx = idx_sorted[:top_m]
+    return selected_idx, scores
